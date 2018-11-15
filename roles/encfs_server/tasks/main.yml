@@ -1,0 +1,53 @@
+---
+- name: unmount data directory (if necessary)
+  shell: fusermount -u /root/tmp/data
+  ignore_errors: true
+
+- name: remove data directory
+  file:
+    path: /root/tmp/data
+    state: absent
+
+- name: remove backup data directory
+  file:
+    path: /root/tmp/data2
+    state: absent
+
+- name: remove encrypted data directory
+  file:
+    path: /root/tmp/data_encrypted
+    state: absent
+
+- name: create data directory
+  file:
+    path: /root/tmp/data
+    state: directory
+    mode: 0700
+
+- name: create backup data directory
+  file:
+    path: /root/tmp/data2
+    state: directory
+    mode: 0700
+
+- name: create encrypted data directory
+  file:
+    path: /root/tmp/data_encrypted
+    state: directory
+    mode: 0700
+
+- name: create a file in the data directory
+  file:
+    path: /root/tmp/data/test.txt
+    state: touch
+    mode: 0700
+
+- name: copy files from data to backup data directory
+  shell: cp -rf /root/tmp/data/* /root/tmp/data2/.
+
+- name: run encfs
+  shell: printf "p\ntest\n" | encfs --public --stdinpass -o nonempty /root/tmp/data_encrypted /root/tmp/data
+
+- name: copy files from backup data to data directory
+  shell: cp -rf /root/tmp/data2/* /root/tmp/data/.
+

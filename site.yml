@@ -1,0 +1,8 @@
+---
+# Sets up an encrypted directory
+- name: install and configure encfs
+  hosts: encfs
+  remote_user: root
+
+  roles:
+    - encfs_server
